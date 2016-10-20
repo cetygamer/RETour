@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Linq;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
-using System.IO;
-using System.Reflection;
-using EasyHook;
-using System.Runtime.Remoting;
+﻿using EasyHook;
 using REHookLib;
-using System.Threading;
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Runtime.Remoting;
 
 namespace RETour
 {
@@ -17,40 +11,14 @@ namespace RETour
     {
         private static Process _reProcess;
         private static string _targetExe = @"C:\Jeux\RESIDENTEVIL\RESIDENTEVIL.EXE";
-
         private static String ChannelName;
-
-        private static void PrepareREProcess()
-        {
-            _reProcess = new Process();
-            var reStartInfo = new ProcessStartInfo();
-            reStartInfo.UseShellExecute = true;
-            reStartInfo.FileName = _targetExe;
-
-            _reProcess.StartInfo = reStartInfo;
-            _reProcess.Start();
-        }
-
-        private static ProcessThread GetUIThread(Process proc)
-        {
-            if (proc.MainWindowHandle == null) return null;
-            int id = GetWindowThreadProcessId(proc.MainWindowHandle, IntPtr.Zero);
-            foreach (ProcessThread pt in proc.Threads)
-                if (pt.Id == id) return pt;
-            return null;
-        }
 
         [System.Runtime.InteropServices.DllImport("user32.dll")]
         private static extern int GetWindowThreadProcessId(IntPtr hWnd, IntPtr procid);
 
-
         static void Main()
         {
-
             Int32 targetPID = 0;
-            /*PrepareREProcess();
-            targetPID = _reProcess.Id;
-            */
 
             bool useExistingProc = targetPID != 0;
 
@@ -83,6 +51,26 @@ namespace RETour
                 Debug.WriteLine("<Press any key to exit>");
                 _reProcess.Kill();
             }
+        }
+
+        private static void PrepareREProcess()
+        {
+            _reProcess = new Process();
+            var reStartInfo = new ProcessStartInfo();
+            reStartInfo.UseShellExecute = true;
+            reStartInfo.FileName = _targetExe;
+
+            _reProcess.StartInfo = reStartInfo;
+            _reProcess.Start();
+        }
+
+        private static ProcessThread GetUIThread(Process proc)
+        {
+            if (proc.MainWindowHandle == null) return null;
+            int id = GetWindowThreadProcessId(proc.MainWindowHandle, IntPtr.Zero);
+            foreach (ProcessThread pt in proc.Threads)
+                if (pt.Id == id) return pt;
+            return null;
         }
     }
 }

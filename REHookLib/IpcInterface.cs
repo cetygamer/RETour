@@ -7,19 +7,19 @@ namespace REHookLib
 {
     public class IpcInterface : MarshalByRefObject
     {
-        public void IsInstalled(Int32 InClientPID)
+        public void NotifySucessfulInstallation(Int32 inClientPID)
         {
-            Console.WriteLine("REHook has been installed in target {0}.\r\n", InClientPID);
+            Console.WriteLine("REHook has been installed in target {0}.\r\n", inClientPID);
         }
 
-        public void OnOpenFileMapping(Int32 InClientPID, String[] InFileNames)
+        public void OnHooking()
         {
             Debug.WriteLine("OnOpenFileMapping code");
         }
 
-        public void ReportException(Exception InInfo)
+        public void ReportException(Exception inInfo)
         {
-            Console.WriteLine("The target process has reported an error:\r\n" + InInfo.ToString());
+            Console.WriteLine("The target process has reported an error:\r\n" + inInfo.ToString());
         }
 
         public void Ping()
