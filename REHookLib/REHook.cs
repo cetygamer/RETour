@@ -13,9 +13,11 @@ namespace REHookLib
     public class REHook : IEntryPoint
     {
         IpcInterface _ipcInterface;
-        LocalHook _openFileMappingLocalHook;
+
 
         #region OpenFileMapping
+        LocalHook _openFileMappingLocalHook;
+
         [UnmanagedFunctionPointer(CallingConvention.StdCall, SetLastError = true, CharSet = CharSet.Ansi)]
         delegate IntPtr OpenFileMappingDelegate(uint dwDesiredAccess, bool bInheritHandle, string lpName);
 
