@@ -14,7 +14,7 @@ namespace REHookLib
 
         public void OnHooking()
         {
-            Debug.WriteLine("OnOpenFileMapping code");
+            
         }
 
         public void ReportException(Exception inInfo)

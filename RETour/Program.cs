@@ -10,11 +10,8 @@ namespace RETour
     public class Program
     {
         private static Process _reProcess;
-        private static string _targetExe = @"C:\Jeux\RESIDENTEVIL\RESIDENTEVIL.EXE";
+        private static string _targetExe = @"C:\Jeux\RESIDENT EVIL\RESIDENTEVIL.EXE";
         private static String ChannelName;
-
-        [System.Runtime.InteropServices.DllImport("user32.dll")]
-        private static extern int GetWindowThreadProcessId(IntPtr hWnd, IntPtr procid);
 
         static void Main()
         {
@@ -63,6 +60,9 @@ namespace RETour
             _reProcess.StartInfo = reStartInfo;
             _reProcess.Start();
         }
+
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        private static extern int GetWindowThreadProcessId(IntPtr hWnd, IntPtr procid);
 
         private static ProcessThread GetUIThread(Process proc)
         {
