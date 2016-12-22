@@ -10,16 +10,16 @@ namespace RETour
 {
     public class Program
     {
-        private static string _targetExe = @"C:\Jeux\RESIDENT EVIL\RESIDENTEVIL.EXE";
+        private static string _targetExe = "";
         private static String ChannelName;
 
         static void Main()
         {
+            _targetExe = Path.Combine(Environment.CurrentDirectory, "RESIDENTEVIL.EXE");
             Int32 targetPID = 0;
             try
             {
                 RemoteHooking.IpcCreateServer<IpcInterface>(ref ChannelName, WellKnownObjectMode.SingleCall);
-
                 string injectionLibrary = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "REHookLib.dll");
                 RemoteHooking.CreateAndInject(_targetExe, "", 0, InjectionOptions.DoNotRequireStrongName, injectionLibrary, injectionLibrary, out targetPID, ChannelName);
                 Console.WriteLine("Created and injected process {0}", targetPID);
@@ -28,6 +28,7 @@ namespace RETour
                 {
                     if (Process.GetProcessesByName("RESIDENTEVIL").Length <= 0)
                     {
+                        Thread.Sleep(500);
                         Environment.Exit(0);
                     }
                 }

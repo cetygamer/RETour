@@ -8,13 +8,59 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Linq;
-using System.Windows.Forms;
 
 namespace REHookLib
 {
+    public enum DriveType : uint
+    {
+        /// <summary>The drive type cannot be determined.</summary>
+        Unknown = 0,    //DRIVE_UNKNOWN
+                        /// <summary>The root path is invalid, for example, no volume is mounted at the path.</summary>
+        Error = 1,        //DRIVE_NO_ROOT_DIR
+                          /// <summary>The drive is a type that has removable media, for example, a floppy drive or removable hard disk.</summary>
+        Removable = 2,    //DRIVE_REMOVABLE
+                          /// <summary>The drive is a type that cannot be removed, for example, a fixed hard drive.</summary>
+        Fixed = 3,        //DRIVE_FIXED
+                          /// <summary>The drive is a remote (network) drive.</summary>
+        Remote = 4,        //DRIVE_REMOTE
+                           /// <summary>The drive is a CD-ROM drive.</summary>
+        CDROM = 5,        //DRIVE_CDROM
+                          /// <summary>The drive is a RAM disk.</summary>
+        RAMDisk = 6        //DRIVE_RAMDISK
+    }
+
     public class REHook : IEntryPoint
     {
         IpcInterface _ipcInterface;
+
+        #region GetDriveTypeA
+        LocalHook _getDriveTypeLocalHook;
+        static bool _fakedDriveTypeAtStartup = false;
+
+        /// <summary>
+        /// The GetDriveType function determines whether a disk drive is a removable, fixed, CD-ROM, RAM disk, or network drive
+        /// </summary>
+        /// <param name="lpRootPathName">A pointer to a null-terminated string that specifies the root directory and returns information about the disk.A trailing backslash is required. If this parameter is NULL, the function uses the root of the current directory.</param>
+        [DllImport("kernel32.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+        private static extern DriveType GetDriveType(
+            [MarshalAs(UnmanagedType.LPTStr)] string lpRootPathName);
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall, SetLastError = true, CharSet = CharSet.Ansi)]
+        public delegate DriveType GetDriveTypeDelegate(
+            [MarshalAs(UnmanagedType.LPTStr)] string lpRootPathName);
+
+        private static DriveType GetDriveTypeHookMethod(
+            [MarshalAs(UnmanagedType.LPTStr)] string lpRootPathName)
+        {
+            if(_fakedDriveTypeAtStartup == false)
+            {
+                _fakedDriveTypeAtStartup = true;
+                return DriveType.CDROM;
+            }
+            return GetDriveType(lpRootPathName);
+        }
+
+        #endregion GetDriveTypeA
 
         #region mmioOpenW
         LocalHook _mmioOpenLocalHook;
@@ -24,8 +70,6 @@ namespace REHookLib
           IntPtr lpmmioinfo,
           int dwOpenFlags)
         {
-            if(CorrectFilePath(szFilename) != szFilename)
-                MessageBox.Show("mmioOpenW (WINMM.DLL) modif appel, paramètre szFilename :" + szFilename + "-> " + CorrectFilePath(szFilename));
             return mmioOpenW(CorrectFilePath(szFilename), lpmmioinfo, dwOpenFlags);
         }
 
@@ -55,8 +99,6 @@ namespace REHookLib
             [MarshalAs(UnmanagedType.U4)] FileAttributes flagsAndAttributes,
             IntPtr templateFile)
         {
-            if (CorrectFilePath(filename) != filename)
-                MessageBox.Show("mmioOpenW (WINMM.DLL) modif appel, paramètre szFilename :" + filename + "-> " + CorrectFilePath(filename));
             return CreateFile(
                 CorrectFilePath(filename),
                 access,
@@ -81,7 +123,7 @@ namespace REHookLib
             }
             else
             {
-                correctedString = Path.Combine(@"C:\Jeux\RESIDENT EVIL\FRA\MOVIE", Path.GetFileName(correctedString));
+                correctedString = Path.Combine(Environment.CurrentDirectory, @"FRA\MOVIE\" + Path.GetFileName(correctedString));
             }
 
             return correctedString;
@@ -138,6 +180,15 @@ namespace REHookLib
                     this);
 
                 _mmioOpenLocalHook.ThreadACL.SetExclusiveACL(new int[] { 0 });
+
+                IntPtr getDriveTypeProcAddress = LocalHook.GetProcAddress("kernel32.dll", "GetDriveTypeA");
+
+                _getDriveTypeLocalHook = LocalHook.Create(
+                    getDriveTypeProcAddress,
+                    new GetDriveTypeDelegate(GetDriveTypeHookMethod),
+                    this);
+
+                _getDriveTypeLocalHook.ThreadACL.SetExclusiveACL(new int[] { 0 });
             }
             catch (Exception exception)
             {
@@ -147,7 +198,7 @@ namespace REHookLib
             }
 
             _ipcInterface.NotifySucessfulInstallation(RemoteHooking.GetCurrentProcessId());
-
+            Console.ReadLine();
             RemoteHooking.WakeUpProcess();
 
             // wait for host process termination...
