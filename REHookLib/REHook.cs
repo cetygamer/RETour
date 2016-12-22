@@ -16,65 +16,32 @@ namespace REHookLib
     public class REHook : IEntryPoint
     {
         IpcInterface _ipcInterface;
-        static String _lastCorrectedMovieFilename;
 
-        #region MCISendCommand
-        LocalHook _mciSendCommandLocalHook;
-
-        [DllImport("winmm.dll", CharSet = CharSet.Ansi, BestFitMapping = true, ThrowOnUnmappableChar = true, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.U4)]
-        public static extern uint MciSendCommand(
-                uint mciId,
-                uint uMsg,
-                uint dwParam1,
-                IntPtr dwParam2);
-
-        public static uint MciSendCommandHookMethod(
-                uint mciId,
-                uint uMsg,
-                uint dwParam1,
-                IntPtr dwParam2)
-        {
-            return MciSendCommand(
-                mciId,
-                uMsg,
-                dwParam1,
-                dwParam2);
-        }
-
-        public delegate uint MciSendCommandDelegate(
-                uint mciId,
-                uint uMsg,
-                uint dwParam1,
-                IntPtr dwParam2);
-
-        #endregion MCISendCommand
-
-        #region MmioOpen
+        #region mmioOpenW
         LocalHook _mmioOpenLocalHook;
 
-
         private static IntPtr MmioOpenHookMethod(
-          [MarshalAs(UnmanagedType.LPStr)]string szFilename,
-          MMIOINFO lpmmioinfo,
+          [MarshalAs(UnmanagedType.LPWStr)]string szFilename,
+          IntPtr lpmmioinfo,
           int dwOpenFlags)
         {
-            return MmioOpen(_lastCorrectedMovieFilename, new MMIOINFO(), dwOpenFlags);
+            MessageBox.Show(CorrectFilePath(szFilename));
+            return mmioOpenW(CorrectFilePath(szFilename), lpmmioinfo, dwOpenFlags);
         }
 
-        [UnmanagedFunctionPointer(CallingConvention.StdCall, SetLastError = true, CharSet = CharSet.Ansi)]
+        [UnmanagedFunctionPointer(CallingConvention.StdCall, SetLastError = true, CharSet = CharSet.Unicode)]
         public delegate IntPtr MmioOpenDelegate(
-          [MarshalAs(UnmanagedType.LPStr)]string szFilename,
-          MMIOINFO lpmmioinfo,
+          [MarshalAs(UnmanagedType.LPWStr)]string szFilename,
+          IntPtr lpmmioinfo,
           int dwOpenFlags);
 
-        [DllImport("WINMM.DLL", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
-        private static extern IntPtr MmioOpen(
-           [MarshalAs(UnmanagedType.LPStr)]string szFilename,
-           MMIOINFO lpmmioinfo,
+        [DllImport("WINMM.DLL", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+        private static extern IntPtr mmioOpenW(
+           [MarshalAs(UnmanagedType.LPWStr)]string szFilename,
+           IntPtr lpmmioinfo,
            int dwOpenFlags);
 
-        #endregion MmioOpen
+        #endregion mmioOpenW
 
         #region CreateFile
         LocalHook _createFileLocalHook;
@@ -88,11 +55,8 @@ namespace REHookLib
             [MarshalAs(UnmanagedType.U4)] FileAttributes flagsAndAttributes,
             IntPtr templateFile)
         {
-            _lastCorrectedMovieFilename = "";
-            _lastCorrectedMovieFilename = CorrectFilePath(filename);
-
             return CreateFile(
-                _lastCorrectedMovieFilename,
+                CorrectFilePath(filename),
                 access,
                 share,
                 securityAttributes,
@@ -143,60 +107,6 @@ namespace REHookLib
 
         #endregion CreateFile
 
-        #region CreateProcess
-        LocalHook _createProcessLocalHook;
-
-        [UnmanagedFunctionPointer(CallingConvention.StdCall, SetLastError = true, CharSet = CharSet.Ansi)]
-        public delegate bool CreateProcessDelegate(
-          string lpApplicationName,
-          string lpCommandLine,
-          ref SECURITY_ATTRIBUTES lpProcessAttributes,
-          ref SECURITY_ATTRIBUTES lpThreadAttributes,
-          bool bInheritHandles,
-          uint dwCreationFlags,
-          IntPtr lpEnvironment,
-          string lpCurrentDirectory,
-          [In] ref STARTUPINFO lpStartupInfo,
-          out PROCESS_INFORMATION lpProcessInformation);
-
-        [DllImport("kernel32.dll", CharSet = CharSet.Ansi, SetLastError = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern bool CreateProcess(
-          string lpApplicationName,
-          string lpCommandLine,
-          ref SECURITY_ATTRIBUTES lpProcessAttributes,
-          ref SECURITY_ATTRIBUTES lpThreadAttributes,
-          bool bInheritHandles,
-          uint dwCreationFlags,
-          IntPtr lpEnvironment,
-          string lpCurrentDirectory,
-          [In] ref STARTUPINFO lpStartupInfo,
-          out PROCESS_INFORMATION lpProcessInformation);
-
-        public static bool CreateProcessHookMethod(string lpApplicationName,
-          string lpCommandLine,
-          ref SECURITY_ATTRIBUTES lpProcessAttributes,
-          ref SECURITY_ATTRIBUTES lpThreadAttributes,
-          bool bInheritHandles,
-          uint dwCreationFlags,
-          IntPtr lpEnvironment,
-          string lpCurrentDirectory,
-          [In] ref STARTUPINFO lpStartupInfo,
-          out PROCESS_INFORMATION lpProcessInformation)
-        {
-            lpProcessInformation = new PROCESS_INFORMATION();
-
-            return CreateProcess(lpApplicationName, lpCommandLine,
-              ref lpProcessAttributes,
-              ref lpThreadAttributes,
-              bInheritHandles,
-              dwCreationFlags,
-              lpEnvironment,
-              lpCurrentDirectory,
-              ref lpStartupInfo,
-              out lpProcessInformation);
-        }
-        #endregion CreateProcess
-        
         public REHook(RemoteHooking.IContext inContext, String inChannelName)
         {
             // connect to host...
@@ -209,16 +119,6 @@ namespace REHookLib
             // install hook...
             try
             {
-                IntPtr createProcessProcAddress = LocalHook.GetProcAddress("kernel32.dll", "CreateProcessA");
-
-                _createProcessLocalHook = LocalHook.Create(
-                    createProcessProcAddress,
-                    new CreateProcessDelegate(CreateProcessHookMethod),
-                    this);
-
-                _createProcessLocalHook.ThreadACL.SetExclusiveACL(new int[] { 0 });
-                
-
                 IntPtr createFileProcAddress = LocalHook.GetProcAddress("kernel32.dll", "CreateFileA");
 
                 _createFileLocalHook = LocalHook.Create(
@@ -228,7 +128,7 @@ namespace REHookLib
 
                 _createFileLocalHook.ThreadACL.SetExclusiveACL(new int[] { 0 });
 
-                /*IntPtr mmioOpenProcAddress = LocalHook.GetProcAddress("WINMM.dll", "mmioOpenA");
+                IntPtr mmioOpenProcAddress = LocalHook.GetProcAddress("WINMM.dll", "mmioOpenW");
 
                 _mmioOpenLocalHook = LocalHook.Create(
                     mmioOpenProcAddress,
@@ -236,17 +136,6 @@ namespace REHookLib
                     this);
 
                 _mmioOpenLocalHook.ThreadACL.SetExclusiveACL(new int[] { 0 });
-                */
-
-                /*IntPtr mciSendCommandProcAddress = LocalHook.GetProcAddress("WINMM.dll", "mciSendCommandA");
-
-                _mciSendCommandLocalHook = LocalHook.Create(
-                    mciSendCommandProcAddress,
-                    new MciSendCommandDelegate(MciSendCommandHookMethod),
-                    this);
-
-                _mciSendCommandLocalHook.ThreadACL.SetExclusiveACL(new int[] { 0 });
-                */
             }
             catch (Exception exception)
             {
