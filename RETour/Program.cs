@@ -28,9 +28,9 @@ namespace RETour
                 {
                     if (Process.GetProcessesByName("RESIDENTEVIL").Length <= 0)
                     {
-                        Thread.Sleep(500);
                         Environment.Exit(0);
                     }
+                    Thread.Sleep(1000);
                 }
             }
             catch (Exception exception)
