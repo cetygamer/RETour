@@ -46,7 +46,6 @@
     <Compile Include="IpcInterface.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="REHook.cs" />
-    <Compile Include="structs\Structs.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="EasyHook32.dll">

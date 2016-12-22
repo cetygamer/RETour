@@ -4,6 +4,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.Remoting;
+using System.Threading;
 
 namespace RETour
 {
@@ -23,7 +24,13 @@ namespace RETour
                 RemoteHooking.CreateAndInject(_targetExe, "", 0, InjectionOptions.DoNotRequireStrongName, injectionLibrary, injectionLibrary, out targetPID, ChannelName);
                 Console.WriteLine("Created and injected process {0}", targetPID);
                 Console.WriteLine("<Press any key to exit>");
-                Console.ReadKey();
+                while(true)
+                {
+                    if (Process.GetProcessesByName("RESIDENTEVIL").Length <= 0)
+                    {
+                        Environment.Exit(0);
+                    }
+                }
             }
             catch (Exception exception)
             {

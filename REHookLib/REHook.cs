@@ -1,5 +1,4 @@
 ﻿using EasyHook;
-using REHookLib.Structs;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -25,7 +24,8 @@ namespace REHookLib
           IntPtr lpmmioinfo,
           int dwOpenFlags)
         {
-            MessageBox.Show(CorrectFilePath(szFilename));
+            if(CorrectFilePath(szFilename) != szFilename)
+                MessageBox.Show("mmioOpenW (WINMM.DLL) modif appel, paramètre szFilename :" + szFilename + "-> " + CorrectFilePath(szFilename));
             return mmioOpenW(CorrectFilePath(szFilename), lpmmioinfo, dwOpenFlags);
         }
 
@@ -55,6 +55,8 @@ namespace REHookLib
             [MarshalAs(UnmanagedType.U4)] FileAttributes flagsAndAttributes,
             IntPtr templateFile)
         {
+            if (CorrectFilePath(filename) != filename)
+                MessageBox.Show("mmioOpenW (WINMM.DLL) modif appel, paramètre szFilename :" + filename + "-> " + CorrectFilePath(filename));
             return CreateFile(
                 CorrectFilePath(filename),
                 access,
