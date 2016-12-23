@@ -70,7 +70,7 @@ namespace RETour
             Console.WriteLine(" A : Options du jeu (permet de configurer les commandes)");
             Console.WriteLine(" ALT + F4 : QUITTER LE JEU");
             Console.WriteLine();
-            Console.WriteLine("Commandes par défaut à la manette (testé ave manette Xbox 360) :");
+            Console.WriteLine("Commandes par défaut à la manette (testé avec une manette Xbox 360) :");
             Console.WriteLine(" Pad directionnel : se déplacer");
             Console.WriteLine(" A : Action/Choisir/Frapper/Tirer");
             Console.WriteLine(" B : Courir");
