@@ -31,6 +31,7 @@ namespace REHookLib
 
     public class REHook : IEntryPoint
     {
+        private static string _runningDirectory = Environment.CurrentDirectory;
         IpcInterface _ipcInterface;
 
         #region GetDriveTypeA
@@ -52,7 +53,7 @@ namespace REHookLib
         private static DriveType GetDriveTypeHookMethod(
             [MarshalAs(UnmanagedType.LPTStr)] string lpRootPathName)
         {
-            if(_fakedDriveTypeAtStartup == false && Path.GetPathRoot(Environment.CurrentDirectory) == lpRootPathName)
+            if(_fakedDriveTypeAtStartup == false && Path.GetPathRoot(_runningDirectory) == lpRootPathName)
             {
                 _fakedDriveTypeAtStartup = true;
                 return DriveType.CDROM;
@@ -123,7 +124,7 @@ namespace REHookLib
             }
             else
             {
-                correctedString = Path.Combine(Environment.CurrentDirectory, @"FRA\MOVIE\" + Path.GetFileName(correctedString));
+                correctedString = Path.Combine(_runningDirectory, @"FRA\MOVIE\" + Path.GetFileName(correctedString));
             }
 
             return correctedString;
@@ -163,6 +164,8 @@ namespace REHookLib
             // install hook...
             try
             {
+                _runningDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
                 IntPtr createFileProcAddress = LocalHook.GetProcAddress("kernel32.dll", "CreateFileA");
 
                 _createFileLocalHook = LocalHook.Create(
@@ -198,7 +201,6 @@ namespace REHookLib
             }
 
             _ipcInterface.NotifySucessfulInstallation(RemoteHooking.GetCurrentProcessId());
-            Console.ReadLine();
             RemoteHooking.WakeUpProcess();
 
             // wait for host process termination...
