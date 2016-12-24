@@ -59,7 +59,7 @@ namespace RETour
             Console.WriteLine("-----------------------------------------------");
             Console.WriteLine("            www.abandonware-france.org");
             Console.WriteLine("-----------------------------------------------");
-            Console.WriteLine(" Merci aux forumeurs sur le site http://re123.bplaced.net/ pour le wrapper DirectDraw ! ");
+            Console.WriteLine(" Merci aux forumeurs sur le site http://re123.bplaced.net/ pour leurs informations précieuses ! ");
             Console.WriteLine("-----------------------------------------------");
             Console.WriteLine("Commandes par défaut au clavier :");
             Console.WriteLine(" Touches fléchées : se déplacer");

@@ -52,7 +52,7 @@ namespace REHookLib
         private static DriveType GetDriveTypeHookMethod(
             [MarshalAs(UnmanagedType.LPTStr)] string lpRootPathName)
         {
-            if(_fakedDriveTypeAtStartup == false)
+            if(_fakedDriveTypeAtStartup == false && Path.GetPathRoot(Environment.CurrentDirectory) == lpRootPathName)
             {
                 _fakedDriveTypeAtStartup = true;
                 return DriveType.CDROM;
