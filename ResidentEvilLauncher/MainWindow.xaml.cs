@@ -38,17 +38,23 @@ namespace ResidentEvilLauncher
             {
                 exeName = "RESIDENTEVIL-1024.EXE";
             }
-            string path = Path.Combine(workDir, exeName);
-            if(File.Exists(path))
+            string residentEvilExecutablePath = Path.Combine(workDir, exeName);
+            if(File.Exists(residentEvilExecutablePath))
             {
-                ProcessStartInfo psInfo = new ProcessStartInfo(path);
+                ProcessStartInfo psInfo = new ProcessStartInfo(residentEvilExecutablePath);
+
+                string RETourExecutablePath = Path.Combine(workDir, "RESIDENT_EVIL.exe");
+                if(File.Exists(RETourExecutablePath))
+                {
+                    psInfo = new ProcessStartInfo(RETourExecutablePath, Path.GetFileName(residentEvilExecutablePath));
+                }
                 psInfo.UseShellExecute = true;
                 MessageBox.Show("Ne pas faire Alt-Tab en cours de jeu, sous peine de devoir redémarrer le jeu");
                 Process.Start(psInfo);
             }
             else
             {
-                MessageBox.Show(String.Format("{0} introuvable.", path));
+                MessageBox.Show(String.Format("{0} introuvable.", residentEvilExecutablePath));
             }
         }
 

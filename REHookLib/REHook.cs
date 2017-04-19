@@ -203,7 +203,7 @@ namespace REHookLib
             _ipcInterface.NotifySucessfulInstallation(RemoteHooking.GetCurrentProcessId());
             RemoteHooking.WakeUpProcess();
 
-            // wait for host process termination...
+            // wait until we are not needed anymore...
             try
             {
                 while (true)
