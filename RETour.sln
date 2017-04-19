@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RETour", "RETour\RETour.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "REHookLib", "REHookLib\REHookLib.csproj", "{7662888A-B437-4037-AE03-FEEC6B01A670}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ResidentEvilLauncher", "ResidentEvilLauncher\ResidentEvilLauncher.csproj", "{E8E5F67B-D54E-4121-A6F1-D32FA30C8B0D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{7662888A-B437-4037-AE03-FEEC6B01A670}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7662888A-B437-4037-AE03-FEEC6B01A670}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7662888A-B437-4037-AE03-FEEC6B01A670}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E8E5F67B-D54E-4121-A6F1-D32FA30C8B0D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E8E5F67B-D54E-4121-A6F1-D32FA30C8B0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E8E5F67B-D54E-4121-A6F1-D32FA30C8B0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E8E5F67B-D54E-4121-A6F1-D32FA30C8B0D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
