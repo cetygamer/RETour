@@ -1,6 +1,5 @@
-﻿using OsInfo;
-using OsInfo.Extensions;
-using System;
+﻿using System;
+using System.Reflection;
 using System.Windows;
 
 namespace ResidentEvilLauncher
@@ -54,8 +53,8 @@ namespace ResidentEvilLauncher
             SetCurrentValue(OptionEnhanceModeDisabledProperty, !Properties.Settings.Default.EnhancedResolutionMode);
             SetCurrentValue(IsDDrawCompatForcedProperty, Properties.Settings.Default.DdrawCompatForce);
 
-            OperatingSystem currentOs = Environment.OSVersion;
-            SetCurrentValue(IsVistaOrNewerProperty, currentOs.IsGreaterThanOrEqualTo(OsVersion.Vista));
+            string ddrawCompatPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), @"ddrawCompat\ddraw.dll");
+            SetCurrentValue(IsVistaOrNewerProperty, System.IO.File.Exists(ddrawCompatPath));
 
             InitializeComponent();
         }
