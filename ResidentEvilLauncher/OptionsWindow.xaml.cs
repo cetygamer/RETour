@@ -1,22 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
-using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+﻿using System.Windows;
 
 namespace ResidentEvilLauncher
 {
-    /// <summary>
-    /// Interaction logic for OptionsWindow.xaml
-    /// </summary>
     public partial class OptionsWindow : Window
     {
         public bool OptionEnhanceModeEnabled
@@ -35,6 +20,14 @@ namespace ResidentEvilLauncher
         public static readonly DependencyProperty OptionEnhanceModeDisabledProperty =
             DependencyProperty.Register("OptionEnhanceModeDisabled", typeof(bool), typeof(OptionsWindow), new PropertyMetadata(true));
 
+        public bool IsDDrawCompatForced
+        {
+            get { return (bool)GetValue(IsDDrawCompatForcedProperty); }
+            set { SetValue(IsDDrawCompatForcedProperty, value); }
+        }
+        public static readonly DependencyProperty IsDDrawCompatForcedProperty =
+            DependencyProperty.Register("IsDDrawCompatForced", typeof(bool), typeof(OptionsWindow), new PropertyMetadata(false));
+
         public DelegateCommand SavePrefs { get; private set; }
         public DelegateCommand CancelPrefs { get; private set; }
         public DelegateCommand DisableEnhanceMode { get; private set; }
@@ -48,6 +41,7 @@ namespace ResidentEvilLauncher
             EnableEnhanceMode = new DelegateCommand(EnableEnhanceMode_Execute);
             SetCurrentValue(OptionEnhanceModeEnabledProperty, Properties.Settings.Default.EnhancedResolutionMode);
             SetCurrentValue(OptionEnhanceModeDisabledProperty, !Properties.Settings.Default.EnhancedResolutionMode);
+            SetCurrentValue(IsDDrawCompatForcedProperty, Properties.Settings.Default.DdrawCompatForce);
 
             InitializeComponent();
         }
@@ -55,6 +49,7 @@ namespace ResidentEvilLauncher
         private void SavePrefs_Execute(object parameters)
         {
             Properties.Settings.Default.EnhancedResolutionMode = (bool)GetValue(OptionEnhanceModeEnabledProperty);
+            Properties.Settings.Default.DdrawCompatForce = (bool)GetValue(IsDDrawCompatForcedProperty);
             Properties.Settings.Default.Save();
             Close();
         }

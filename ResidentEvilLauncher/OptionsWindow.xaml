@@ -15,6 +15,8 @@
         <StackPanel Orientation="Vertical" Grid.Row="0">
             <RadioButton GroupName="ModeGroup" Content="Jeu en résolution 640x480 (mode par défaut)" Command="{Binding DisableEnhanceMode}" IsChecked="{Binding OptionEnhanceModeDisabled, Mode=TwoWay}" />
             <RadioButton GroupName="ModeGroup" Content="Jeu en résolution 1024x768 (graphismes un peu plus fins)" Command="{Binding EnableEnhanceMode}" IsChecked="{Binding OptionEnhanceModeEnabled, Mode=TwoWay}" />
+            <Rectangle Height="2" Fill="Black" Margin="10" />
+            <CheckBox Content="Forcer l'usage de ddrawCompat (utile si le jeu ne se lance pas)" IsChecked="{Binding IsDDrawCompatForced, Mode=TwoWay}" />
         </StackPanel>
         <DockPanel HorizontalAlignment="Right" Grid.Row="1">
             <Button Content="OK" DockPanel.Dock="Left" Height="40" Width="80" Margin="10" Command="{Binding SavePrefs}" />

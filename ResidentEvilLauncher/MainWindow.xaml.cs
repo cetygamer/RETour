@@ -1,19 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows;
-using System.Configuration;
 using System.Diagnostics;
 using System.IO;
+using System.Management;
 using System.Reflection;
+using System.Windows;
 using System.Windows.Navigation;
 
 namespace ResidentEvilLauncher
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         public DelegateCommand PlayCommand { get; private set; }
@@ -32,30 +26,97 @@ namespace ResidentEvilLauncher
 
         private void PlayCommand_Execute(object parameters)
         {
-            string exeName = "RESIDENTEVIL.EXE";
-            string workDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            if(IsEnhancedResolutionModeEnabled())
+            try
             {
-                exeName = "RESIDENTEVIL-1024.EXE";
-            }
-            string residentEvilExecutablePath = Path.Combine(workDir, exeName);
-            if(File.Exists(residentEvilExecutablePath))
-            {
-                ProcessStartInfo psInfo = new ProcessStartInfo(residentEvilExecutablePath);
+                string workDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
-                string RETourExecutablePath = Path.Combine(workDir, "RESIDENT_EVIL.exe");
-                if(File.Exists(RETourExecutablePath))
+                if (Properties.Settings.Default.FirstRun && HasAMDGPU())
                 {
-                    psInfo = new ProcessStartInfo(RETourExecutablePath, Path.GetFileName(residentEvilExecutablePath));
+                    Properties.Settings.Default.FirstRun = false;
+                    Properties.Settings.Default.DdrawCompatForce = true;
+                    Properties.Settings.Default.Save();
                 }
-                psInfo.UseShellExecute = true;
-                MessageBox.Show("Ne pas faire Alt-Tab en cours de jeu, sous peine de devoir redémarrer le jeu");
-                Process.Start(psInfo);
+
+                if (Properties.Settings.Default.DdrawCompatForce == false)
+                {
+                    if (File.Exists(Path.Combine(workDir, "ddraw.dll")))
+                    {
+                        System.IO.File.Delete(Path.Combine(workDir, "ddraw.dll"));
+                    }
+                }
+                else
+                {
+                    System.IO.File.Copy(Path.Combine(workDir, @"ddrawCompat\ddraw.dll"), Path.Combine(workDir, "ddraw.dll"));
+                }
+
+                string exeName = "RESIDENTEVIL.EXE";
+
+                if (IsEnhancedResolutionModeEnabled())
+                {
+                    exeName = "RESIDENTEVIL-1024.EXE";
+                }
+
+                string residentEvilExecutablePath = Path.Combine(workDir, exeName);
+                if (File.Exists(residentEvilExecutablePath))
+                {
+                    ProcessStartInfo psInfo = new ProcessStartInfo(residentEvilExecutablePath);
+
+                    string RETourExecutablePath = Path.Combine(workDir, "RESIDENT_EVIL.exe");
+                    if (File.Exists(RETourExecutablePath))
+                    {
+                        psInfo = new ProcessStartInfo(RETourExecutablePath, Path.GetFileName(residentEvilExecutablePath));
+                    }
+                    psInfo.UseShellExecute = true;
+                    MessageBox.Show("Ne pas faire Alt-Tab en cours de jeu, sous peine de devoir redémarrer le jeu");
+                    Process.Start(psInfo);
+                }
+                else
+                {
+                    MessageBox.Show(String.Format("{0} introuvable.", residentEvilExecutablePath));
+                }
             }
-            else
+            catch
             {
-                MessageBox.Show(String.Format("{0} introuvable.", residentEvilExecutablePath));
+
             }
+        }
+
+        private bool HasAMDGPU()
+        {
+            string gpuName = GetWMIInformation("Win32_VideoController"); //Windows 7 and newer
+            string secondGpuName = GetWMIInformation("Win32_DisplayConfiguration"); //pre-Windows 7
+
+            bool amdGPUFound = (gpuName.Contains("ATI ") || gpuName.Contains("AMD ") || gpuName.Contains(" Radeon"));
+            if(amdGPUFound == false)
+            {
+                amdGPUFound = (secondGpuName.Contains("ATI ") || secondGpuName.Contains("AMD ") || secondGpuName.Contains(" Radeon"));
+            }
+
+            return amdGPUFound;
+        }
+
+        /// <summary>
+        /// https://msdn.microsoft.com/en-us/library/aa394512(v=vs.85).aspx
+        /// https://msdn.microsoft.com/en-us/library/aa394137(v=vs.85).aspx
+        /// </summary>
+        private string GetWMIInformation(string wmiClass)
+        {
+            string value = "";
+
+            ManagementObjectSearcher searcher = new ManagementObjectSearcher(String.Format("SELECT * FROM {0}", wmiClass));
+
+            foreach (ManagementObject mo in searcher.Get())
+            {
+                foreach (PropertyData property in mo.Properties)
+                {
+                    if (property.Name == "Description" || property.Name == "DeviceName" || property.Name == "Name" || property.Name == "VideoProcessor")
+                    {
+                        value = String.Format("{0} {1}", value, property.Value);
+                    }
+                }
+            }
+
+            return value;
         }
 
         private bool IsEnhancedResolutionModeEnabled()
