@@ -1,4 +1,7 @@
-﻿using System.Windows;
+﻿using OsInfo;
+using OsInfo.Extensions;
+using System;
+using System.Windows;
 
 namespace ResidentEvilLauncher
 {
@@ -28,6 +31,14 @@ namespace ResidentEvilLauncher
         public static readonly DependencyProperty IsDDrawCompatForcedProperty =
             DependencyProperty.Register("IsDDrawCompatForced", typeof(bool), typeof(OptionsWindow), new PropertyMetadata(false));
 
+        public bool IsVistaOrNewer
+        {
+            get { return (bool)GetValue(IsVistaOrNewerProperty); }
+            set { SetValue(IsVistaOrNewerProperty, value); }
+        }
+        public static readonly DependencyProperty IsVistaOrNewerProperty =
+            DependencyProperty.Register("IsVistaOrNewer", typeof(bool), typeof(OptionsWindow), new PropertyMetadata(true));
+
         public DelegateCommand SavePrefs { get; private set; }
         public DelegateCommand CancelPrefs { get; private set; }
         public DelegateCommand DisableEnhanceMode { get; private set; }
@@ -42,6 +53,9 @@ namespace ResidentEvilLauncher
             SetCurrentValue(OptionEnhanceModeEnabledProperty, Properties.Settings.Default.EnhancedResolutionMode);
             SetCurrentValue(OptionEnhanceModeDisabledProperty, !Properties.Settings.Default.EnhancedResolutionMode);
             SetCurrentValue(IsDDrawCompatForcedProperty, Properties.Settings.Default.DdrawCompatForce);
+
+            OperatingSystem currentOs = Environment.OSVersion;
+            SetCurrentValue(IsVistaOrNewerProperty, currentOs.IsGreaterThanOrEqualTo(OsVersion.Vista));
 
             InitializeComponent();
         }
