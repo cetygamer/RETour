@@ -46,7 +46,14 @@ namespace ResidentEvilLauncher
                 }
                 else
                 {
-                    System.IO.File.Copy(Path.Combine(workDir, @"ddrawCompat\ddraw.dll"), Path.Combine(workDir, "ddraw.dll"));
+                    try
+                    {
+                        System.IO.File.Copy(Path.Combine(workDir, "ddrawCompat", "ddraw.dll"), Path.Combine(workDir, "ddraw.dll"), true);
+                    }
+                    catch
+                    {
+
+                    }
                 }
 
                 string exeName = "RESIDENTEVIL.EXE";
