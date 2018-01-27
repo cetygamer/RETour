@@ -111,7 +111,7 @@ namespace REHookLib
         }
 
         /// <summary>
-        /// E:\horr\FRA\movie\CAPCOM.AVI devient C:\Jeux\RESIDENT EVIL\FRA\MOVIE\CAPCOM.AVI
+        /// E:\horr\USA\movie\CAPCOM.AVI devient C:\Jeux\RESIDENT EVIL\USA\MOVIE\CAPCOM.AVI
         /// </summary>
         /// <param name="filename"></param>
         /// <returns></returns>
@@ -124,7 +124,7 @@ namespace REHookLib
             }
             else
             {
-                correctedString = Path.Combine(_runningDirectory, @"FRA\MOVIE\" + Path.GetFileName(correctedString));
+                correctedString = Path.Combine(_runningDirectory, @"USA\MOVIE\" + Path.GetFileName(correctedString));
             }
 
             return correctedString;

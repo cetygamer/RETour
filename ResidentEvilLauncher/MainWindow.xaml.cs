@@ -74,12 +74,12 @@ namespace ResidentEvilLauncher
                         psInfo = new ProcessStartInfo(RETourExecutablePath, Path.GetFileName(residentEvilExecutablePath));
                     }
                     psInfo.UseShellExecute = true;
-                    MessageBox.Show("Ne pas faire Alt-Tab en cours de jeu, sous peine de devoir redémarrer le jeu");
+                    MessageBox.Show("Do not Alt-Tab during the game, otherwise you will have to restart the game");
                     Process.Start(psInfo);
                 }
                 else
                 {
-                    MessageBox.Show(String.Format("{0} introuvable.", residentEvilExecutablePath));
+                    MessageBox.Show(String.Format("{0} not found.", residentEvilExecutablePath));
                 }
             }
             catch

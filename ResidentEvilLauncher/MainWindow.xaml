@@ -21,18 +21,18 @@
         </Grid.RowDefinitions>
         <Image Source="background.png" Stretch="Fill" Grid.ColumnSpan="2" Grid.Row="0" />
         <StackPanel Grid.Column="1" Grid.Row="0">
-            <Button Content="Jouer à RESIDENT EVIL" Command="{Binding PlayCommand}" Style="{DynamicResource PlayButtonStyle}" />
-            <Button Content="Contrôles par défaut" Command="{Binding ControlsCommand}" Style="{DynamicResource ViewControlsButtonStyle}" />
+            <Button Content="Play RESIDENT EVIL" Command="{Binding PlayCommand}" Style="{DynamicResource PlayButtonStyle}" />
+            <Button Content="Default controls" Command="{Binding ControlsCommand}" Style="{DynamicResource ViewControlsButtonStyle}" />
             <Button Content="Options" Command="{Binding OptionsCommand}" Style="{DynamicResource OptionsButtonStyle}" />
-            <Button Content="Quitter" Command="{Binding QuitCommand}" Style="{DynamicResource QuitButtonStyle}" />
+            <Button Content="Quit" Command="{Binding QuitCommand}" Style="{DynamicResource QuitButtonStyle}" />
         </StackPanel>
         <TextBlock Grid.Column="0"  Grid.Row="1" HorizontalAlignment="Left">
             <Hyperlink NavigateUri="http://www.abandonware-france.org" RequestNavigate="Hyperlink_RequestNavigate">
-                Visiter Abandonware-France
+                Visit Abandonware-France
             </Hyperlink>
         </TextBlock>
         <TextBlock Grid.Column="1"  Grid.Row="1" HorizontalAlignment="Right">
-            <Run Text="Merci aux forumeurs de" />
+            <Run Text="Thanks to forum members of" />
             <Hyperlink NavigateUri="http://re123.bplaced.net/board/index.php" RequestNavigate="Hyperlink_RequestNavigate">
                 re123.bplaced.net
             </Hyperlink>

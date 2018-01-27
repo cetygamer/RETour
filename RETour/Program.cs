@@ -32,8 +32,8 @@ namespace RETour
             {
                 if(!File.Exists(_targetExe))
                 {
-                    Console.WriteLine(String.Format("{0} introuvable !", _targetExe));
-                    Console.WriteLine("Appuyez sur une touche pour quitter... ");
+                    Console.WriteLine(String.Format("{0} not found !", _targetExe));
+                    Console.WriteLine("Press any key to exit... ");
                     Console.ReadKey();
                     return;
                 }
@@ -41,7 +41,7 @@ namespace RETour
                 RemoteHooking.IpcCreateServer<IpcInterface>(ref ChannelName, WellKnownObjectMode.SingleCall);
                 string injectionLibrary = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "REHookLib.dll");
                 RemoteHooking.CreateAndInject(_targetExe, "", 0, InjectionOptions.DoNotRequireStrongName, injectionLibrary, injectionLibrary, out targetPID, ChannelName);
-                Console.WriteLine("Resident Evil lancé avec succès.");
+                Console.WriteLine("Resident Evil successfully launched.");
 
                 ShowWindow(GetConsoleWindow(), SW_HIDE);
 
@@ -58,8 +58,8 @@ namespace RETour
             {
                 ShowWindow(GetConsoleWindow(), SW_SHOW);
 
-                Console.WriteLine("Erreur grave apparue lors du lancement de Resident Evil \r\n{0}", exception.ToString());
-                Console.WriteLine("Appuyez sur une touche pour quitter... ");
+                Console.WriteLine("Unexpected error occurred while launching Resident Evil \r\n{0}", exception.ToString());
+                Console.WriteLine("Press any key to exit... ");
                 Console.ReadKey();
             }
         }
